@@ -48,6 +48,12 @@
             display: flex;
         }
 
+        /* Ajuste para empujar el footer al fondo en la Pantalla 1 */
+        #screenPhone {
+            flex: 1;
+            justify-content: space-between;
+        }
+
         /* Header común */
         .header-nav {
             width: 100%;
@@ -183,7 +189,7 @@
             font-size: 13px;
             color: var(--text-tertiary);
             text-align: center;
-            margin: 0 auto;
+            margin: auto auto 0 auto;
             margin-bottom: var(--safe-area-inset-bottom);
         }
 
